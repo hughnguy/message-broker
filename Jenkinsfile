@@ -61,3 +61,20 @@ void updatePomVersion() {
 	pom.version = versionInfo.version
 	writeMavenPom model: pom
 }
+
+Map computeGroupIdInfo(String groupId) {
+	String baseGroupId = groupId
+	String otherBranch = null
+	if (baseGroupId.contains(".branch.")) {
+		baseGroupId = baseGroupId.replaceAll("[.]branch[.].*\$", "")
+		otherBranch = groupId.substring((baseGroupId+".branch.").length()).replace('.', '/')
+	}
+	String branchGroupId = baseGroupId
+	if ("${env.BRANCH_NAME}" != "master") {
+		branchGroupId = baseGroupId + ".branch.${env.BRANCH_NAME.replace('/', '.').replaceAll("[^-a-zA-Z0-9_.]", "-")}"
+	}
+	if ("${env.BRANCH_NAME}" == otherBranch) {
+		otherBranch = null
+	}
+	return [base: baseGroupId, branch: branchGroupId, otherBranch: otherBranch]
+}
