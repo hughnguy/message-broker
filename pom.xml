@@ -3,25 +3,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.klipfolio</groupId>
+    <groupId>com.crunchshop</groupId>
     <artifactId>message-broker</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <name>message-broker</name>
+    <description>Message queue for micro-service communication</description>
 
+    <!-- Download from nexus group repository -->
+    <repositories>
+        <repository>
+            <id>ci-project-repository</id>
+            <url>http://localhost:8081/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+    <!-- Publish to nexus hosted release repository -->
     <distributionManagement>
         <repository>
-            <id>klipfolio-repository</id>
-            <url>https://nexus.kfdev.ca/repository/klipfolio-release/</url>
+            <id>ci-project-repository-mirror</id>
+            <url>http://localhost:8081/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
-
-    <properties>
-        <sonar.language>java</sonar.language>
-        <sonar.login>d36a1750b1df0d252f5fdbd38765f2de0ce0bbb6</sonar.login>
-        <sonar.jacoco.reportPaths>target/coverage-reports/jacoco.exec</sonar.jacoco.reportPaths>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -41,11 +44,6 @@
             <version>1.18.6</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.klipfolio</groupId>
-            <artifactId>log-builder</artifactId>
-            <version>4.0.46-1eb399e</version>
-        </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -71,12 +69,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>klipfolio-repository-mirror</id>
-            <url>https://nexus.kfdev.ca/repository/klipfolio-group/</url>
-        </repository>
-    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -90,41 +82,7 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.9</version>
-                <executions>
-                    <execution>
-                        <id>jacoco-initialize</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>jacoco-site</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <destFile>${basedir}/target/coverage-reports/jacoco.exec</destFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.4</version>
-                <configuration>
-                    <xmlOutput>true</xmlOutput>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
 </project>

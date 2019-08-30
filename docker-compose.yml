@@ -1,0 +1,17 @@
+version: '3.5'
+
+services:
+
+  redis_ci_project:
+    image: redis:4-alpine
+    container_name: ${REDIS_CONTAINER_NAME:-redis_ci_project}
+    command:
+      - '--maxmemory 150mb'
+    ports:
+      - '6379:6379'
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+        window: 120s
