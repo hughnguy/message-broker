@@ -3,6 +3,8 @@ pipeline {
     tools {
         // Pipeline Maven Plugin: the quoted string contains the name of the installation
         maven "maven-3.3.9"
+
+        jdk "java-1.7"
     }
     options {
         timestamps ()
