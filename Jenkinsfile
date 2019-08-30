@@ -30,6 +30,13 @@ pipeline {
             }
         }
     }
+    post {
+        success {
+            script {
+                wipeWorkSpace();
+            }
+        }
+    }
 }
 
 void updateVersion() {
@@ -41,8 +48,6 @@ void updateVersion() {
 }
 
 Map computeNewVersion(String groupId, String artifactId, String version) {
-    echo "wut";
-    echo version;
 	Map groupIdInfo = computeGroupIdInfo(groupId)
 	String[] versionParts = version.split("-")[0].split("\\.")
 	versionParts[versionParts.length - 1] = "${env.BUILD_NUMBER}".toString()
@@ -79,4 +84,12 @@ Map computeGroupIdInfo(String groupId) {
 		otherBranch = null
 	}
 	return [base: baseGroupId, branch: branchGroupId, otherBranch: otherBranch]
+}
+
+void wipeWorkSpace() {
+	try {
+		deleteDir()
+	} catch (e) {
+	  echo "WARNING: could not delete the workspace. the error is ${e}"
+	}
 }
