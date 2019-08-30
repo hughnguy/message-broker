@@ -1,9 +1,6 @@
 pipeline {
     agent any
     tools {
-        // Nodejs Plugin: the quoted string contains the name of the installation
-        nodejs "nodejs-10.16.0"
-
         // Pipeline Maven Plugin: the quoted string contains the name of the installation
         maven "maven-3.3.9"
     }
@@ -11,21 +8,22 @@ pipeline {
         timestamps ()
     }
     stages {
-        //stage('Build Java') {
-            //steps {
-                //sh 'mvn -B clean compile'
-            //}
-        //}
-        //stage('Unit Tests') {
-            //steps {
-                //sh 'mvn test'
-            //}
-        //}
+        stage('Build Java') {
+            steps {
+                sh 'mvn -B clean compile'
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
         stage('Deploy artifacts to Nexus') {
             steps {
                 script {
                     updateVersion()
-                    //sh 'mvn deploy'
+
+                    sh 'mvn deploy'
                 }
             }
         }
