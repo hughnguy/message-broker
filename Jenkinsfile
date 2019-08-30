@@ -41,6 +41,8 @@ void updateVersion() {
 }
 
 Map computeNewVersion(String groupId, String artifactId, String version) {
+    echo "wut";
+    echo version;
 	Map groupIdInfo = computeGroupIdInfo(groupId)
 	String[] versionParts = version.split("-")[0].split("\\.")
 	versionParts[versionParts.length - 1] = "${env.BUILD_NUMBER}".toString()
