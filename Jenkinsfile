@@ -25,7 +25,7 @@ pipeline {
                 script {
                     updateVersion()
 
-                    sh 'mvn deploy'
+                    sh 'mvn -Dhttps.protocols=TLSv1.2 deploy'
                 }
             }
         }
