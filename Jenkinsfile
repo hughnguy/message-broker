@@ -6,6 +6,9 @@ pipeline {
 
         jdk "java-1.7"
     }
+    environment {
+        DEPENDENCY_UPDATER_ENDPOINT = "http://dockerhost:8888/api/v1/dependency"
+    }
     options {
         timestamps ()
     }
@@ -33,6 +36,11 @@ pipeline {
                         updateVersion()
 
                         sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 jar:jar deploy:deploy'
+
+                        echo scm.userRemoteConfigs[0].url;
+
+                        // Send post request here to slackbot to update projects that have dependency??
+                        //updateBranchesForDependentRepos(env.POM_GROUP_ID, env.POM_ARTIFACT_ID, env.POM_VERSION)
                     }
                 }
             }
@@ -44,6 +52,29 @@ pipeline {
                 wipeWorkSpace();
             }
         }
+    }
+}
+
+void updateBranchesForDependentRepos(String repoUrl, String groupId, String artifactId, String version) {
+    try {
+        def response = sh(
+            returnStdout: true,
+            script: "curl -XPOST -H \"Content-type: application/json\" -d '{\"repo\": \"${env.BUILD_URL}\",\"groupId\": \"${groupId}\",\"artifactId\": \"${artifactId}\",\"version\": \"${version}\"}' '${env.DEPENDENCY_UPDATER_ENDPOINT}'"
+        ).trim()
+
+        sh "echo 'Post response: '${response}"
+
+        // readJSON / writeJSON requires Pipeline Utility Steps plugin
+        def jsonResponse = readJSON text: response
+        def statusCode = jsonResponse['status']
+
+        if(statusCode != 200) {
+            error("echo Incorrect status code returned: ${statusCode}");
+        }
+
+    } catch(err) {
+        sh "echo ${err}"
+        error("Failed to update branches for dependent repos.");
     }
 }
 
