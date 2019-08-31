@@ -10,22 +10,26 @@ pipeline {
         timestamps ()
     }
     stages {
-        stage('Build Java') {
-            steps {
-                sh 'mvn -B clean compile'
-            }
-        }
-        stage('Unit Tests') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-        stage('Deploy artifacts to Nexus') {
-            steps {
-                script {
-                    updateVersion()
+        // Config File Provider Plugin (Manage Jenkins > Managed Files > Add a new config > Simple XML File > Add the file in the continuous-integration-project nexus how-to)
 
-                    sh 'mvn -Dhttps.protocols=TLSv1.2 deploy'
+        configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
+            stage('Build Java') {
+                steps {
+                    sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS clean compile'
+                }
+            }
+            stage('Unit Tests') {
+                steps {
+                    sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS test'
+                }
+            }
+            stage('Deploy artifacts to Nexus') {
+                steps {
+                    script {
+                        updateVersion()
+
+                        sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 deploy'
+                    }
                 }
             }
         }
