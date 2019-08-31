@@ -9,23 +9,26 @@ pipeline {
     options {
         timestamps ()
     }
-    // Config File Provider Plugin (Manage Jenkins > Managed Files > Add a new config > Simple XML File > Add the file in the continuous-integration-project nexus how-to)
+    stages {
+        stage('Build Java') {
+            steps {
+                // Config File Provider Plugin (Manage Jenkins > Managed Files > Add a new config > Simple XML File > Add the file in the continuous-integration-project nexus how-to)
 
-    configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
-
-        stages {
-            stage('Build Java') {
-                steps {
+                configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
                     sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS clean compile'
                 }
             }
-            stage('Unit Tests') {
-                steps {
+        }
+        stage('Unit Tests') {
+            steps {
+                configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
                     sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS test'
                 }
             }
-            stage('Deploy artifacts to Nexus') {
-                steps {
+        }
+        stage('Deploy artifacts to Nexus') {
+            steps {
+                configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
                     script {
                         updateVersion()
 
