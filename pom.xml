@@ -5,7 +5,7 @@
 
     <groupId>com.crunchshop</groupId>
     <artifactId>message-broker</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <name>message-broker</name>
     <description>Message queue for micro-service communication</description>
