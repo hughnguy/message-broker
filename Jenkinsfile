@@ -22,7 +22,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
-                    sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS test'
+                    sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS compiler:testCompile surefire:test'
                 }
             }
         }
@@ -32,7 +32,7 @@ pipeline {
                     script {
                         updateVersion()
 
-                        sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 deploy'
+                        sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 jar:jar deploy:deploy'
                     }
                 }
             }
