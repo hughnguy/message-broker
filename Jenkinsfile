@@ -38,7 +38,7 @@ pipeline {
                         sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 jar:jar deploy:deploy'
 
                         // Send post request here to slackbot to update projects that have dependency??
-                        updateBranchesForDependentRepos(env.POM_GROUP_ID, env.POM_ARTIFACT_ID, env.POM_VERSION)
+                        updateBranchesForDependentRepos(env.BRANCH_NAME, env.POM_GROUP_ID, env.POM_ARTIFACT_ID, env.POM_VERSION)
                     }
                 }
             }
@@ -53,7 +53,7 @@ pipeline {
     }
 }
 
-void updateBranchesForDependentRepos(String groupId, String artifactId, String version) {
+void updateBranchesForDependentRepos(String branch, String groupId, String artifactId, String version) {
     def repoUrl = sh(
         returnStdout: true,
         script: 'git config remote.origin.url'
@@ -62,7 +62,7 @@ void updateBranchesForDependentRepos(String groupId, String artifactId, String v
     try {
         def response = sh(
             returnStdout: true,
-            script: "curl -XPOST -H \"Content-type: application/json\" -d '{\"repo\": \"${repoUrl}\",\"groupId\": \"${groupId}\",\"artifactId\": \"${artifactId}\",\"version\": \"${version}\"}' '${env.DEPENDENCY_UPDATER_ENDPOINT}'"
+            script: "curl -XPOST -H \"Content-type: application/json\" -d '{\"repo\": \"${repoUrl}\",\"branch\": \"${branch}\",\"groupId\": \"${groupId}\",\"artifactId\": \"${artifactId}\",\"version\": \"${version}\"}' '${env.DEPENDENCY_UPDATER_ENDPOINT}'"
         ).trim()
 
         sh "echo 'Post response: '${response}"
