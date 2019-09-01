@@ -55,11 +55,16 @@ pipeline {
     }
 }
 
-void updateBranchesForDependentRepos(String repoUrl, String groupId, String artifactId, String version) {
+void updateBranchesForDependentRepos(String groupId, String artifactId, String version) {
+    def repoUrl = sh(
+        returnStdout: true,
+        script: 'git config remote.origin.url'
+    ).trim()
+
     try {
         def response = sh(
             returnStdout: true,
-            script: "curl -XPOST -H \"Content-type: application/json\" -d '{\"repo\": \"${env.BUILD_URL}\",\"groupId\": \"${groupId}\",\"artifactId\": \"${artifactId}\",\"version\": \"${version}\"}' '${env.DEPENDENCY_UPDATER_ENDPOINT}'"
+            script: "curl -XPOST -H \"Content-type: application/json\" -d '{\"repo\": \"${repoUrl}\",\"groupId\": \"${groupId}\",\"artifactId\": \"${artifactId}\",\"version\": \"${version}\"}' '${env.DEPENDENCY_UPDATER_ENDPOINT}'"
         ).trim()
 
         sh "echo 'Post response: '${response}"
