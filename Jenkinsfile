@@ -37,10 +37,8 @@ pipeline {
 
                         sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 jar:jar deploy:deploy'
 
-                        echo scm.userRemoteConfigs[0].url;
-
                         // Send post request here to slackbot to update projects that have dependency??
-                        //updateBranchesForDependentRepos(env.POM_GROUP_ID, env.POM_ARTIFACT_ID, env.POM_VERSION)
+                        updateBranchesForDependentRepos(env.POM_GROUP_ID, env.POM_ARTIFACT_ID, env.POM_VERSION)
                     }
                 }
             }
