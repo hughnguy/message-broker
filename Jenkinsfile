@@ -35,6 +35,7 @@ pipeline {
                     script {
                         updateVersion()
 
+                        // Deploy version
                         sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 jar:jar deploy:deploy'
 
                         // Send post request here to slackbot to update projects that have dependency??
@@ -84,8 +85,19 @@ void updateBranchesForDependentRepos(String branch, String groupId, String artif
 void updateVersion() {
 	if (fileExists("pom.xml")) {
 		updatePomVersion()
-	} else {
-		error("This doesn't look like a maven or grails project, I don't know how to update the version here.")
+	}
+	if (fileExists("package.json") {
+	    // also check if there is a publishConfig variable in the package file
+
+	    String shortCommit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+        String branchQualifier = ""
+        if ("${env.BRANCH_NAME}" != "master") {
+            branchQualifier = "-${env.BRANCH_NAME}".replace("/", ".").replaceAll(/[^-a-zA-Z0-9.]/, "-")
+        }
+        env.KF_VERSION = "4.0." + "${env.BUILD_NUMBER}".toString() + "-" + shortCommit + branchQualifier
+
+        sh "npm --no-git-tag-version version ${KF_VERSION}"
+        sh "npm publish"
 	}
 }
 
