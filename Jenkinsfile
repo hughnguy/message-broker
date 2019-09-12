@@ -86,7 +86,7 @@ void updateVersion() {
 	if (fileExists("pom.xml")) {
 		updatePomVersion()
 	}
-	if (fileExists("package.json") {
+	if (fileExists("package.json")) {
 	    // also check if there is a publishConfig variable in the package file
 
 	    String shortCommit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
