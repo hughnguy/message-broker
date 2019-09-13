@@ -93,18 +93,18 @@ void updateVersion() {
 		updatePomVersion()
 	}
 	if (fileExists("package.json")) {
-	    // also check if there is a publishConfig variable in the package file
-
-	    String shortCommit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-        String branchQualifier = ""
-        if ("${env.BRANCH_NAME}" != "master") {
-            branchQualifier = "-${env.BRANCH_NAME}".replace("/", ".").replaceAll(/[^-a-zA-Z0-9.]/, "-")
-        }
-        env.KF_VERSION = "4.0." + "${env.BUILD_NUMBER}".toString() + "-" + shortCommit + branchQualifier
-
-        sh "npm --no-git-tag-version version ${KF_VERSION}"
-        sh "npm publish"
+	    updateNpmPackageVersion()
 	}
+}
+
+void updateNpmPackageVersion() {
+    String shortCommit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+    String branchQualifier = ""
+    if ("${env.BRANCH_NAME}" != "master") {
+        branchQualifier = "-${env.BRANCH_NAME}".replace("/", ".").replaceAll(/[^-a-zA-Z0-9.]/, "-")
+    }
+    env.NPM_DEPENDENCY_VERSION = "0.0." + "${env.BUILD_NUMBER}".toString() + "-" + shortCommit + branchQualifier
+    sh "npm --no-git-tag-version version ${env.NPM_DEPENDENCY_VERSION}"
 }
 
 Map computeNewVersion(String groupId, String artifactId, String version) {
