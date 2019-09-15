@@ -39,7 +39,7 @@ pipeline {
             steps {
                 configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
                     script {
-                        dependency_helper.updateVersion(true, false)
+                        dependency_helper.updateVersionToDeploy(true, false)
 
                         // Deploy updated version
                         sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 jar:jar deploy:deploy'
