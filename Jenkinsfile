@@ -1,3 +1,12 @@
+library(
+    identifier: 'jenkins-shared-library-ciproject@master',
+    retriever: modernSCM([
+        $class: 'GitSCMSource',
+        remote: 'https://github.com/hughnguy/jenkins-shared-library-ciproject.git',
+        credentialsId: 'jenkins-shared-library-credentials'
+    ])
+)
+
 pipeline {
     agent any
     tools {
@@ -5,9 +14,6 @@ pipeline {
         maven "maven-3.3.9"
 
         jdk "java-1.7"
-    }
-    environment {
-        DEPENDENCY_UPDATER_ENDPOINT = "http://dockerhost:8888/api/v1/dependency"
     }
     options {
         timestamps ()
@@ -33,13 +39,12 @@ pipeline {
             steps {
                 configFileProvider([configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
                     script {
-                        updateVersion()
+                        dependency_helper.updateVersion(true, false)
 
-                        // Deploy version
+                        // Deploy updated version
                         sh 'mvn --batch-mode --update-snapshots --settings $MAVEN_SETTINGS -Dhttps.protocols=TLSv1.2 jar:jar deploy:deploy'
 
-                        // Send post request here to slackbot to update projects that have dependency??
-                        updateBranchesForDependentRepos(env.BRANCH_NAME, env.POM_GROUP_ID, env.POM_ARTIFACT_ID, env.POM_VERSION, null)
+                        dependency_helper.updateBranchesForDependentRepos()
                     }
                 }
             }
@@ -48,108 +53,8 @@ pipeline {
     post {
         always {
             script {
-                wipeWorkSpace();
+                util_helper.wipeWorkSpace();
             }
         }
     }
-}
-
-void updateBranchesForDependentRepos(
-    String branch,
-    String pomGroupId,
-    String pomArtifactId,
-    String pomVersion,
-    String npmVersion
-) {
-    def repoUrl = sh(
-        returnStdout: true,
-        script: 'git config remote.origin.url'
-    ).trim()
-
-    try {
-        def response = sh(
-            returnStdout: true,
-            script: "curl -XPOST -H \"Content-type: application/json\" -d '{\"repo\": \"${repoUrl}\",\"branch\": \"${branch}\",\"pomGroupId\": \"${pomGroupId}\",\"pomArtifactId\": \"${pomArtifactId}\",\"pomVersion\": \"${pomVersion}\",\"npmVersion\": \"${npmVersion}\"}' '${env.DEPENDENCY_UPDATER_ENDPOINT}'"
-        ).trim()
-
-        sh "echo 'Post response: '${response}"
-
-        // readJSON / writeJSON requires Pipeline Utility Steps plugin
-        def jsonResponse = readJSON text: response
-        def statusCode = jsonResponse['status']
-
-        if(statusCode != 200) {
-            error("echo Incorrect status code returned: ${statusCode}");
-        }
-
-    } catch(err) {
-        sh "echo ${err}"
-        error("Failed to update branches for dependent repos.");
-    }
-}
-
-void updateVersion() {
-	if (fileExists("pom.xml")) {
-		updatePomVersion()
-	}
-	if (fileExists("package.json")) {
-	    updateNpmPackageVersion()
-	}
-}
-
-void updateNpmPackageVersion() {
-    String shortCommit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-    String branchQualifier = ""
-    if ("${env.BRANCH_NAME}" != "master") {
-        branchQualifier = "-${env.BRANCH_NAME}".replace("/", ".").replaceAll(/[^-a-zA-Z0-9.]/, "-")
-    }
-    env.NPM_DEPENDENCY_VERSION = "0.0." + "${env.BUILD_NUMBER}".toString() + "-" + shortCommit + branchQualifier
-    sh "npm --no-git-tag-version version ${env.NPM_DEPENDENCY_VERSION}"
-}
-
-Map computeNewVersion(String groupId, String artifactId, String version) {
-	Map groupIdInfo = computeGroupIdInfo(groupId)
-	String[] versionParts = version.split("-")[0].split("\\.")
-	versionParts[versionParts.length - 1] = "${env.BUILD_NUMBER}".toString()
-	String shortCommit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-	version = versionParts.join(".") + "-" + shortCommit
-	echo "********************\n********************\n******************** Version info: ${groupIdInfo.branch}:${artifactId}:${version}\n********************\n********************"
-	env.POM_GROUP_ID = groupIdInfo.branch
-	env.POM_ARTIFACT_ID = artifactId
-	env.POM_VERSION = version
-	return [groupId: groupIdInfo.branch, artifactId: artifactId, version: version]
-}
-
-void updatePomVersion() {
-	def pom = readMavenPom file: 'pom.xml'
-	Map versionInfo = computeNewVersion(pom.groupId, pom.artifactId, pom.version)
-	pom.groupId = versionInfo.groupId
-	pom.artifactId = versionInfo.artifactId
-	pom.version = versionInfo.version
-	writeMavenPom model: pom
-}
-
-Map computeGroupIdInfo(String groupId) {
-	String baseGroupId = groupId
-	String otherBranch = null
-	if (baseGroupId.contains(".branch.")) {
-		baseGroupId = baseGroupId.replaceAll("[.]branch[.].*\$", "")
-		otherBranch = groupId.substring((baseGroupId+".branch.").length()).replace('.', '/')
-	}
-	String branchGroupId = baseGroupId
-	if ("${env.BRANCH_NAME}" != "master") {
-		branchGroupId = baseGroupId + ".branch.${env.BRANCH_NAME.replace('/', '.').replaceAll("[^-a-zA-Z0-9_.]", "-")}"
-	}
-	if ("${env.BRANCH_NAME}" == otherBranch) {
-		otherBranch = null
-	}
-	return [base: baseGroupId, branch: branchGroupId, otherBranch: otherBranch]
-}
-
-void wipeWorkSpace() {
-	try {
-		deleteDir()
-	} catch (e) {
-	  echo "WARNING: could not delete the workspace. the error is ${e}"
-	}
 }
