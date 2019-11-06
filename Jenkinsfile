@@ -53,6 +53,7 @@ pipeline {
     post {
         always {
             script {
+                notify_helper.notifySlack("#ciproject");
                 util_helper.wipeWorkSpace();
             }
         }
