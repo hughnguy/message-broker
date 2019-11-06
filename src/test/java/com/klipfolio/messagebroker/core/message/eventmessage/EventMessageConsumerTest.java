@@ -30,7 +30,7 @@ public class EventMessageConsumerTest {
         new Verifications() {{
             EventProcessMapper eventProcessMapper;
             eventSubscriber.registerConsumerToEvent(eventProcessMapper = withCapture()); times = 1;
-            Assert.assertEquals(null, eventProcessMapper.getEventClass());
+            Assert.assertEquals(AssetShared.class, eventProcessMapper.getEventClass());
         }};
     }
 
