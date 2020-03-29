@@ -1,12 +1,14 @@
-package com.crunchshop.experimental.rabbit;
+package com.crunchshop.messagebroker.impl.redis;
 
 import com.crunchshop.messagebroker.MessageBroker;
 import com.crunchshop.messagebroker.core.MessageConsumer;
 
-public class RabbitBroadcastQueue<T> extends RabbitMessageQueue<T> {
+import java.util.concurrent.ScheduledExecutorService;
 
-    public RabbitBroadcastQueue(RabbitClient rabbitClient) throws Exception {
-        super(rabbitClient);
+class RedisBroadcastQueue<T> extends RedisMessageQueue<T> {
+
+    RedisBroadcastQueue(RedisClient redisClient, ScheduledExecutorService scheduler) {
+        super(redisClient, scheduler);
     }
 
     @Override

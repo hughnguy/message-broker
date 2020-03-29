@@ -1,6 +1,6 @@
-package com.klipfolio.experimental.rabbit;
+package com.crunchshop.experimental.rabbit;
 
-import com.klipfolio.messagebroker.core.Topic;
+import com.crunchshop.messagebroker.core.Topic;
 
 public class RabbitTopic implements Topic {
 

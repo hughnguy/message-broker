@@ -1,4 +1,4 @@
-package com.klipfolio.experimental.rabbit;
+package com.crunchshop.experimental.rabbit;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;

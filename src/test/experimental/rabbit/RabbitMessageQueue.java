@@ -1,9 +1,8 @@
-package com.klipfolio.experimental.rabbit;
+package com.crunchshop.experimental.rabbit;
 
-import com.klipfolio.messagebroker.core.*;
-import com.klipfolio.messagebroker.core.exception.ConsumerProcessingException;
-import com.klipfolio.messagebroker.core.exception.MessageCorruptException;
-import com.klipfolio.messagebroker.core.exception.MessageQueueException;
+import com.crunchshop.messagebroker.core.exception.ConsumerProcessingException;
+import com.crunchshop.messagebroker.core.exception.MessageCorruptException;
+import com.crunchshop.messagebroker.core.exception.MessageQueueException;
 import com.rabbitmq.client.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

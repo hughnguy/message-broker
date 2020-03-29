@@ -1,7 +1,7 @@
-package com.klipfolio.experimental.rabbit;
+package com.crunchshop.experimental.rabbit;
 
-import com.klipfolio.messagebroker.core.MessageExchange;
-import com.klipfolio.messagebroker.core.Topic;
+import com.crunchshop.messagebroker.core.MessageExchange;
+import com.crunchshop.messagebroker.core.Topic;
 import com.rabbitmq.client.Channel;
 
 import java.io.IOException;

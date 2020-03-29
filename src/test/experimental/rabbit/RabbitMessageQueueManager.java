@@ -1,9 +1,9 @@
-package com.klipfolio.experimental.rabbit;
+package com.crunchshop.experimental.rabbit;
 
-import com.klipfolio.messagebroker.core.MessageConsumer;
-import com.klipfolio.messagebroker.core.MessageDeliveryMode;
-import com.klipfolio.messagebroker.core.MessageQueueManager;
-import com.klipfolio.messagebroker.core.Topic;
+import com.crunchshop.messagebroker.core.MessageConsumer;
+import com.crunchshop.messagebroker.core.MessageDeliveryMode;
+import com.crunchshop.messagebroker.core.MessageQueueManager;
+import com.crunchshop.messagebroker.core.Topic;
 import com.rabbitmq.client.ConnectionFactory;
 
 import java.util.Map;

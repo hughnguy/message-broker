@@ -1,12 +1,12 @@
-package com.crunchshop.experimental.rabbit;
+package com.crunchshop.messagebroker.impl.aws;
 
 import com.crunchshop.messagebroker.MessageBroker;
 import com.crunchshop.messagebroker.core.MessageConsumer;
 
-public class RabbitBroadcastQueue<T> extends RabbitMessageQueue<T> {
+class AWSBroadcastQueue<T> extends AWSMessageQueue<T> {
 
-    public RabbitBroadcastQueue(RabbitClient rabbitClient) throws Exception {
-        super(rabbitClient);
+    AWSBroadcastQueue(AWSClient awsClient) {
+        super(awsClient);
     }
 
     @Override
