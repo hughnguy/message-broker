@@ -1,4 +1,8 @@
 # saas-message-broker
+
+<!-- Jenkins plugin shows icon of build status (https://plugins.jenkins.io/embeddable-build-status/) -->
+[![Build Status](http://localhost:8082/buildStatus/icon?job=message-broker/master)](http://localhost:8082/job/message-broker/master)
+
 Message broker used for event-driven architecture. Facilitates collaboration between our services.
 
 <br />
